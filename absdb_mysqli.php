@@ -10,6 +10,7 @@ class absdb{
 	var $params = array();
 	var $types = null;
 	var $err = null;
+        var $empty_result = '';
 	var $affected_rows = 0;
 
 	function __construct($host, $user, $pass, $db){
@@ -30,10 +31,13 @@ class absdb{
 		if(0===  error_reporting()) return;
 		
 		ob_start();
-		
+                
 		echo 'ABSDB Query: '.$this->sQuery.' - '.$this->types.'<br />';
-		echo 'ABSDB Error: ('.$this->connector->errno.') '.$this->connector->error.'<br /><br />';
-		echo '<pre>';
+		echo 'ABSDB Error: ('.$this->connector->errno.') '.$this->connector->error.'<br />';
+                if($this->empty_result) {
+                    echo 'ABDSB Empty Set Error: ' . $this->empty_result . '<br />';
+                }
+		echo '<br /><pre>';
 		print_r($this->params);;
 		echo '</pre>';
 		
@@ -87,9 +91,14 @@ class absdb{
 			call_user_func_array('mysqli_stmt_bind_result', $pointers);
 			if(!$this->STMT->fetch()) break;
 			$result[] = $row;
+                        if($single) break;
 		}
 
 		$metadata->free();
+                
+                if($this->empty_result && !count($result)) {
+                    $this->error();
+                }
 
 		if($single){
 			return isSet($result[0]) ? $result[0] : null; // return 1 object
@@ -113,11 +122,12 @@ class absdb{
 		return $arr;
 	}
 
-	function query($query=null, $types=null, $params=array()){
+	function query($query=null, $types=null, $params=array(), $empty_result=''){
 		// Executes a query against the database and returns the insert_id for the query where applicable
 		if($query){ // skip if null query
 			$this->sQuery = $query;
 			$this->err = null;
+                        $this->empty_result = $empty_result;
 			$this->types = $types;
 			$this->params = $params;
 			$this->preparse_prepared();
@@ -146,15 +156,15 @@ class absdb{
 		
 	}
 
-	function get_object($query=null, $types=null, $params=array()){
+	function get_object($query=null, $types=null, $params=array(), $empty_result=''){
 		// returns a single stClass object representing first matching row
-		if($query) $this->query($query, $types, $params);
+		if($query) $this->query($query, $types, $params, $empty_result);
 		return $this->STMT ? $this->get_result(true) : null;
 	}
 
-	function get_objects($query=null, $types=null, $params=array()){
+	function get_objects($query=null, $types=null, $params=array(), $empty_result=''){
 		// returns an array of stCladd objects representing matching rows
-		$this->query($query, $types, $params);
+		$this->query($query, $types, $params, $empty_result);
 		return $this->STMT ? $this->get_result() : array();
 	}
 }
