@@ -97,8 +97,6 @@ class absdb {
             if (!$this->STMT->fetch())
                 break;
             $result[] = $row;
-            if ($single)
-                break;
         }
 
         $metadata->free();
