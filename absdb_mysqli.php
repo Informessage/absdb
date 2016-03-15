@@ -173,5 +173,17 @@ class absdb {
         $this->query($query, $types, $params, $empty_result);
         return $this->STMT ? $this->get_result() : array();
     }
+    
+    function transaction() {
+        $this->connector->query('START TRANSACTION');
+    }
+    
+    function commit() {
+        $this->connector->query('COMMIT');
+    }
+    
+    function rollback() {
+        $this->connector->query('ROLLBACK');
+    }
 
 }
