@@ -156,6 +156,10 @@ class absdb {
             if ($this->connector->errno)
                 $this->error();
             $this->affected_rows = $this->connector->affected_rows;
+            // If nothing was found and this is the original query call
+            if (!$this->affected_rows && $query && $empty_result) {
+                $this->error();
+            }
             return $this->STMT->insert_id; // Record primary key
         }
         return null; // return nothing if we got here
