@@ -1,6 +1,5 @@
 {
     "name": "informessage/absdb",
-    "version": "0.1.0",
     "source": {
         "url": "https://github.com/Informessage/absdb",
         "type": "git"
