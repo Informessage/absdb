@@ -142,7 +142,7 @@ class absdb {
 
             if ($types && $this->STMT) {
                 if (count($this->params)) {
-                    if (!call_user_func_array(array($this->STMT, 'bind_param'), array_merge(array($this->types), $this->refValues($this->params)))) {
+                    if (!call_user_func_array(array($this->STMT, 'bind_param'), $this->refValues(array_merge(array($this->types), $this->params)))) {
                         $this->error();
                     }
                 }
